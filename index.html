@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Rekap Absen GTK</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -12,11 +13,12 @@
     
     body {
       font-family: 'Poppins', sans-serif;
-      background-color: #f8fafc;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%);
+      min-height: 100vh;
     }
     
     .select-custom {
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%233b82f6' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
       background-position: right 0.5rem center;
       background-repeat: no-repeat;
       background-size: 1.5em 1.5em;
@@ -26,13 +28,14 @@
     }
     
     .select-custom:focus {
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+      border-color: #3b82f6;
     }
     
     .table-container {
       max-height: calc(100vh - 250px);
       scrollbar-width: thin;
-      scrollbar-color: #c1c1c1 #f1f1f1;
+      scrollbar-color: #93c5fd #f0f9ff;
     }
     
     .table-header th {
@@ -50,111 +53,130 @@
     }
     
     ::-webkit-scrollbar-track {
-      background: #f1f1f1;
+      background: #f0f9ff;
       border-radius: 10px;
     }
     
     ::-webkit-scrollbar-thumb {
-      background: #c1c1c1;
+      background: #93c5fd;
       border-radius: 10px;
     }
     
     ::-webkit-scrollbar-thumb:hover {
-      background: #a8a8a8;
+      background: #60a5fa;
     }
     
     .school-logo {
       height: 60px;
       margin-right: 16px;
       border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      border: 2px solid white;
     }
     
     .header-content {
       display: flex;
       align-items: center;
-      background: white;
+      background: rgba(255, 255, 255, 0.9);
       padding: 12px 16px;
       border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255,255,255,0.3);
     }
     
     .header-text {
-      border-left: 1px solid #e5e7eb;
+      border-left: 2px solid #93c5fd;
       padding-left: 16px;
     }
     
     .card {
-      background: white;
+      background: rgba(255, 255, 255, 0.9);
       border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      transition: all 0.2s ease;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255,255,255,0.3);
+      transition: all 0.3s ease;
     }
     
     .card:hover {
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+      transform: translateY(-2px);
     }
     
     .btn-primary {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2);
-      transition: all 0.2s ease;
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+      color: white;
+      transition: all 0.3s ease;
     }
     
     .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 8px rgba(5, 150, 105, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px rgba(37, 99, 235, 0.3);
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
     }
     
     .btn-secondary {
-      background: #f3f4f6;
-      transition: all 0.2s ease;
+      background: #e0f2fe;
+      color: #1d4ed8;
+      transition: all 0.3s ease;
     }
     
     .btn-secondary:hover {
-      background: #e5e7eb;
-      transform: translateY(-1px);
+      background: #bfdbfe;
+      transform: translateY(-2px);
+      color: #1e40af;
     }
     
     .search-box {
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 8px;
+      border: 1px solid rgba(224, 242, 254, 0.5);
     }
     
     .search-box:focus-within {
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+      border-color: #3b82f6;
     }
     
     .table-row:hover {
-      background-color: #f8fafc !important;
+      background-color: #f0f9ff !important;
     }
     
     .status-badge {
       display: inline-flex;
       align-items: center;
-      padding: 2px 8px;
+      padding: 4px 10px;
       border-radius: 12px;
       font-size: 0.75rem;
       font-weight: 500;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
     
     .status-hadir {
-      background-color: #ecfdf5;
+      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
       color: #065f46;
+      border: 1px solid #a7f3d0;
     }
     
     .status-sakit {
-      background-color: #eff6ff;
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
       color: #1e40af;
+      border: 1px solid #bfdbfe;
     }
     
     .status-izin {
-      background-color: #fef3c7;
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
       color: #92400e;
+      border: 1px solid #fcd34d;
     }
     
     .status-alpa {
-      background-color: #fee2e2;
+      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
       color: #991b1b;
+      border: 1px solid #fca5a5;
     }
     
     .pulse {
@@ -166,46 +188,126 @@
         opacity: 1;
       }
       50% {
-        opacity: 0.5;
+        opacity: 0.7;
       }
     }
     
     .fade-in {
-      animation: fadeIn 0.3s ease-in;
+      animation: fadeIn 0.5s ease-in;
     }
     
     @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Mobile optimizations */
+    @media (max-width: 768px) {
+      .header-content {
+        flex-direction: column;
+        text-align: center;
+        padding: 16px;
+      }
+      
+      .header-text {
+        border-left: none;
+        border-top: 2px solid #93c5fd;
+        padding-left: 0;
+        padding-top: 12px;
+        margin-top: 12px;
+      }
+      
+      .school-logo {
+        margin-right: 0;
+        margin-bottom: 12px;
+        height: 80px;
+      }
+      
+      .table-container {
+        max-height: calc(100vh - 320px);
+      }
+      
+      table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+      
+      th, td {
+        min-width: 120px;
+      }
+      
+      .status-badge {
+        padding: 3px 8px;
+        font-size: 0.7rem;
+      }
+    }
+    
+    /* Floating elements for visual interest */
+    .floating {
+      animation: floating 6s ease-in-out infinite;
+    }
+    
+    @keyframes floating {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+    
+    .floating-delay-1 {
+      animation-delay: 1s;
+    }
+    
+    .floating-delay-2 {
+      animation-delay: 2s;
+    }
+    
+    /* Decorative elements */
+    .decorative-circle {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.1;
+      z-index: -1;
     }
   </style>
 </head>
-<body class="min-h-screen bg-gray-50">
+<body class="min-h-screen">
+  <!-- Decorative background elements -->
+  <div class="decorative-circle floating" style="width: 300px; height: 300px; background: #3b82f6; top: 10%; left: 5%;"></div>
+  <div class="decorative-circle floating floating-delay-1" style="width: 200px; height: 200px; background: #1d4ed8; bottom: 15%; right: 10%;"></div>
+  <div class="decorative-circle floating floating-delay-2" style="width: 150px; height: 150px; background: #60a5fa; top: 40%; right: 20%;"></div>
+  
   <div class="container mx-auto px-4 py-8 max-w-7xl">
     <!-- Header -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
       <div class="header-content w-full md:w-auto">
-        <img src="https://i.ibb.co.com/3YjdDh2N/logo-sekolah-FINAL.png" alt="Logo SMPN 1 Sukasada" class="school-logo">
+        <img src="https://i.ibb.co.com/3YjdDh2N/logo-sekolah-FINAL.png" alt="Logo SMPN 1 Sukasada" class="school-logo floating">
         <div class="header-text">
           <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Rekap Absensi GTK</h1>
           <p class="text-gray-600">SMP Negeri 1 Sukasada</p>
         </div>
       </div>
-      <div class="w-full md:w-auto">
-        <button id="btnExportPDF" disabled class="btn-primary flex items-center gap-2 text-white px-4 py-2.5 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none">
+      <div class="w-full md:w-auto mt-4 md:mt-0">
+        <button id="btnExportPDF" disabled class="btn-primary flex items-center justify-center gap-2 text-white px-4 py-3 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none w-full md:w-auto">
           <i class="fas fa-file-pdf"></i>
-          Export PDF
+          <span>Export PDF</span>
         </button>
       </div>
     </div>
     
     <!-- Filter Controls -->
     <div class="card p-6 mb-6 fade-in">
-      <h2 class="text-lg font-semibold text-gray-800 mb-4">Filter Data</h2>
+      <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+        <i class="fas fa-sliders-h text-blue-500"></i>
+        <span>Filter Data</span>
+      </h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <div>
-          <label for="bulanSelect" class="block text-sm font-medium text-gray-700 mb-1.5">Bulan</label>
-          <select id="bulanSelect" class="select-custom w-full px-3.5 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white">
+          <label for="bulanSelect" class="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1">
+            <i class="fas fa-calendar-alt text-blue-400 text-xs"></i>
+            <span>Bulan</span>
+          </label>
+          <select id="bulanSelect" class="select-custom w-full px-3.5 py-2.5 border border-blue-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
             <option value="">-- Pilih Bulan --</option>
             <option value="Januari">Januari</option>
             <option value="Februari">Februari</option>
@@ -223,15 +325,21 @@
         </div>
         
         <div>
-          <label for="tanggalSelect" class="block text-sm font-medium text-gray-700 mb-1.5">Tanggal</label>
-          <select id="tanggalSelect" disabled class="select-custom w-full px-3.5 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-gray-100">
+          <label for="tanggalSelect" class="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1">
+            <i class="fas fa-calendar-day text-blue-400 text-xs"></i>
+            <span>Tanggal</span>
+          </label>
+          <select id="tanggalSelect" disabled class="select-custom w-full px-3.5 py-2.5 border border-blue-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-100">
             <option value="">-- Semua Tanggal --</option>
           </select>
         </div>
         
         <div>
-          <label for="tipeRekap" class="block text-sm font-medium text-gray-700 mb-1.5">Jenis Rekap</label>
-          <select id="tipeRekap" class="select-custom w-full px-3.5 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white">
+          <label for="tipeRekap" class="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1">
+            <i class="fas fa-chart-bar text-blue-400 text-xs"></i>
+            <span>Jenis Rekap</span>
+          </label>
+          <select id="tipeRekap" class="select-custom w-full px-3.5 py-2.5 border border-blue-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
             <option value="harian">Harian</option>
             <option value="mingguan">Mingguan</option>
             <option value="bulanan">Bulanan</option>
@@ -239,37 +347,41 @@
         </div>
         
         <div class="flex items-end">
-          <button id="btnRefresh" class="btn-secondary w-full text-gray-800 px-4 py-2.5 rounded-lg font-medium flex items-center justify-center gap-2">
+          <button id="btnRefresh" class="btn-secondary w-full text-blue-800 px-4 py-2.5 rounded-lg font-medium flex items-center justify-center gap-2">
             <i class="fas fa-sync-alt"></i>
-            Refresh Data
+            <span>Refresh Data</span>
           </button>
         </div>
       </div>
       
       <!-- Search Box -->
       <div class="relative search-box">
-        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-blue-400">
           <i class="fas fa-search"></i>
         </div>
-        <input type="text" id="searchInput" placeholder="Cari nama guru atau staf..." class="pl-10 w-full px-3.5 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white">
+        <input type="text" id="searchInput" placeholder="Cari nama guru atau staf..." class="pl-10 w-full px-3.5 py-2.5 border border-blue-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
       </div>
     </div>
     
     <!-- Data Table -->
     <div class="card overflow-hidden fade-in">
       <div class="table-container overflow-auto">
-        <table id="rekapTable" class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50 table-header">
+        <table id="rekapTable" class="min-w-full divide-y divide-blue-100">
+          <thead class="bg-blue-50 table-header">
             <tr>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Nama</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Jabatan</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-blue-800 uppercase tracking-wider">
+                <i class="fas fa-user mr-1"></i> Nama
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-blue-800 uppercase tracking-wider">
+                <i class="fas fa-briefcase mr-1"></i> Jabatan
+              </th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
+          <tbody class="bg-white divide-y divide-blue-100">
             <tr>
               <td colspan="100%" class="px-6 py-4 text-center text-sm text-gray-500">
                 <div class="flex flex-col items-center justify-center py-12">
-                  <i class="fas fa-table text-4xl text-gray-300 mb-3"></i>
+                  <i class="fas fa-table text-4xl text-blue-300 mb-3"></i>
                   <p class="text-gray-500">Pilih bulan untuk melihat data absensi</p>
                   <p class="text-sm text-gray-400 mt-1">Data akan muncul setelah memilih bulan</p>
                 </div>
@@ -281,7 +393,7 @@
     </div>
     
     <!-- Info Footer -->
-    <div class="mt-8 text-center text-sm text-gray-500">
+    <div class="mt-8 text-center text-sm text-blue-600">
       <p class="inline-flex items-center gap-1">
         <span>Sistem Rekap Absensi GTK SMP Negeri 1 Sukasada © 2025</span>
         <span>•</span>
@@ -342,7 +454,7 @@
           <tr>
             <td colspan="100%" class="px-6 py-4 text-center text-sm text-gray-500">
               <div class="flex flex-col items-center justify-center py-12">
-                <i class="fas fa-table text-4xl text-gray-300 mb-3"></i>
+                <i class="fas fa-table text-4xl text-blue-300 mb-3"></i>
                 <p class="text-gray-500">Pilih bulan untuk melihat data absensi</p>
                 <p class="text-sm text-gray-400 mt-1">Data akan muncul setelah memilih bulan</p>
               </div>
@@ -357,7 +469,7 @@
         <tr>
           <td colspan="100%" class="px-6 py-4 text-center text-sm text-gray-500">
             <div class="flex flex-col items-center justify-center py-12">
-              <i class="fas fa-spinner fa-spin text-4xl text-emerald-500 mb-3 pulse"></i>
+              <i class="fas fa-spinner fa-spin text-4xl text-blue-500 mb-3 pulse"></i>
               <p class="text-gray-600 font-medium">Memuat data absensi...</p>
               <p class="text-sm text-gray-400 mt-1">Harap tunggu sebentar</p>
             </div>
@@ -429,8 +541,8 @@
       tanggalList.forEach(tgl => {
         const th = document.createElement("th");
         th.scope = "col";
-        th.className = "px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider";
-        th.textContent = tgl;
+        th.className = "px-6 py-3 text-left text-xs font-semibold text-blue-800 uppercase tracking-wider";
+        th.innerHTML = `<i class="fas fa-calendar-day mr-1"></i>${tgl}`;
         thead.appendChild(th);
       });
 
@@ -481,7 +593,7 @@
           <tr>
             <td colspan="100%" class="px-6 py-4 text-center text-sm text-gray-500">
               <div class="flex flex-col items-center justify-center py-12">
-                <i class="fas fa-search text-4xl text-gray-400 mb-3"></i>
+                <i class="fas fa-search text-4xl text-blue-400 mb-3"></i>
                 <p class="text-gray-600 font-medium">Data tidak ditemukan</p>
                 <p class="text-sm text-gray-400 mt-1">Coba dengan kata kunci lain</p>
               </div>
@@ -494,21 +606,21 @@
 
       filteredGuru.forEach(([key, { nama, jabatan }]) => {
         const tr = document.createElement("tr");
-        tr.className = "table-row hover:bg-gray-50 transition-colors";
+        tr.className = "table-row hover:bg-blue-50 transition-colors";
         
         const tdNama = document.createElement("td");
         tdNama.className = "px-6 py-4 whitespace-nowrap";
         const namaDiv = document.createElement("div");
-        namaDiv.className = "text-sm font-medium text-gray-900";
-        namaDiv.textContent = nama;
+        namaDiv.className = "text-sm font-medium text-gray-900 flex items-center";
+        namaDiv.innerHTML = `<i class="fas fa-user-circle text-blue-400 mr-2"></i>${nama}`;
         tdNama.appendChild(namaDiv);
         tr.appendChild(tdNama);
         
         const tdJabatan = document.createElement("td");
         tdJabatan.className = "px-6 py-4 whitespace-nowrap";
         const jabatanDiv = document.createElement("div");
-        jabatanDiv.className = "text-sm text-gray-500";
-        jabatanDiv.textContent = jabatan;
+        jabatanDiv.className = "text-sm text-gray-500 flex items-center";
+        jabatanDiv.innerHTML = `<i class="fas fa-id-card text-blue-400 mr-2"></i>${jabatan}`;
         tdJabatan.appendChild(jabatanDiv);
         tr.appendChild(tdJabatan);
 
@@ -642,13 +754,18 @@
       });
 
       doc.setFontSize(14);
+      doc.setTextColor(37, 99, 235);
       doc.text(`Rekap Absen GTK SMP NEGERI 1 SUKASADA - ${rekapMode.charAt(0).toUpperCase() + rekapMode.slice(1)} ${bulanSelect.value}`, 40, 40);
       doc.autoTable({
         startY: 60,
         head: [headers],
         body: body,
         styles: { fontSize: 9 },
-        headStyles: { fillColor: [16, 185, 129] }, // emerald-500
+        headStyles: { 
+          fillColor: [37, 99, 235], // blue-600
+          textColor: 255,
+          fontStyle: 'bold'
+        },
         margin: { top: 60, left: 40, right: 40 },
       });
       doc.save(`rekap_${rekapMode}_${bulanSelect.value}.pdf`);

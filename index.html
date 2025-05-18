@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rekap Absen GTK</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8fafc;
+    }
+    
+    .select-custom {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+      background-position: right 0.5rem center;
+      background-repeat: no-repeat;
+      background-size: 1.5em 1.5em;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      transition: all 0.2s ease;
+    }
+    
+    .select-custom:focus {
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+    }
+    
+    .table-container {
+      max-height: calc(100vh - 250px);
+      scrollbar-width: thin;
+      scrollbar-color: #c1c1c1 #f1f1f1;
+    }
+    
+    .table-header th {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background-color: white !important;
+      box-shadow: 0 1px 0 #e5e7eb;
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+    
+    .school-logo {
+      height: 60px;
+      margin-right: 16px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .header-content {
+      display: flex;
+      align-items: center;
+      background: white;
+      padding: 12px 16px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    
+    .header-text {
+      border-left: 1px solid #e5e7eb;
+      padding-left: 16px;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      transition: all 0.2s ease;
+    }
+    
+    .card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2);
+      transition: all 0.2s ease;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(5, 150, 105, 0.3);
+    }
+    
+    .btn-secondary {
+      background: #f3f4f6;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-secondary:hover {
+      background: #e5e7eb;
+      transform: translateY(-1px);
+    }
+    
+    .search-box {
+      transition: all 0.2s ease;
+    }
+    
+    .search-box:focus-within {
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+    }
+    
+    .table-row:hover {
+      background-color: #f8fafc !important;
+    }
+    
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    
+    .status-hadir {
+      background-color: #ecfdf5;
+      color: #065f46;
+    }
+    
+    .status-sakit {
+      background-color: #eff6ff;
+      color: #1e40af;
+    }
+    
+    .status-izin {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+    
+    .status-alpa {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+    
+    .pulse {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.5;
+      }
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.3s ease-in;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+  <div class="container mx-auto px-4 py-8 max-w-7xl">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      <div class="header-content w-full md:w-auto">
+        <img src="https://i.ibb.co.com/3YjdDh2N/logo-sekolah-FINAL.png" alt="Logo SMPN 1 Sukasada" class="school-logo">
+        <div class="header-text">
+          <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Rekap Absensi GTK</h1>
+          <p class="text-gray-600">SMP Negeri 1 Sukasada</p>
+        </div>
+      </div>
+      <div class="w-full md:w-auto">
+        <button id="btnExportPDF" disabled class="btn-primary flex items-center gap-2 text-white px-4 py-2.5 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none">
+          <i class="fas fa-file-pdf"></i>
+          Export PDF
+        </button>
+      </div>
+    </div>
+    
+    <!-- Filter Controls -->
+    <div class="card p-6 mb-6 fade-in">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4">Filter Data</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+        <div>
+          <label for="bulanSelect" class="block text-sm font-medium text-gray-700 mb-1.5">Bulan</label>
+          <select id="bulanSelect" class="select-custom w-full px-3.5 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white">
+            <option value="">-- Pilih Bulan --</option>
+            <option value="Januari">Januari</option>
+            <option value="Februari">Februari</option>
+            <option value="Maret">Maret</option>
+            <option value="April">April</option>
+            <option value="Mei">Mei</option>
+            <option value="Juni">Juni</option>
+            <option value="Juli">Juli</option>
+            <option value="Agustus">Agustus</option>
+            <option value="September">September</option>
+            <option value="Oktober">Oktober</option>
+            <option value="November">November</option>
+            <option value="Desember">Desember</option>
+          </select>
+        </div>
+        
+        <div>
+          <label for="tanggalSelect" class="block text-sm font-medium text-gray-700 mb-1.5">Tanggal</label>
+          <select id="tanggalSelect" disabled class="select-custom w-full px-3.5 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-gray-100">
+            <option value="">-- Semua Tanggal --</option>
+          </select>
+        </div>
+        
+        <div>
+          <label for="tipeRekap" class="block text-sm font-medium text-gray-700 mb-1.5">Jenis Rekap</label>
+          <select id="tipeRekap" class="select-custom w-full px-3.5 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white">
+            <option value="harian">Harian</option>
+            <option value="mingguan">Mingguan</option>
+            <option value="bulanan">Bulanan</option>
+          </select>
+        </div>
+        
+        <div class="flex items-end">
+          <button id="btnRefresh" class="btn-secondary w-full text-gray-800 px-4 py-2.5 rounded-lg font-medium flex items-center justify-center gap-2">
+            <i class="fas fa-sync-alt"></i>
+            Refresh Data
+          </button>
+        </div>
+      </div>
+      
+      <!-- Search Box -->
+      <div class="relative search-box">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+          <i class="fas fa-search"></i>
+        </div>
+        <input type="text" id="searchInput" placeholder="Cari nama guru atau staf..." class="pl-10 w-full px-3.5 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white">
+      </div>
+    </div>
+    
+    <!-- Data Table -->
+    <div class="card overflow-hidden fade-in">
+      <div class="table-container overflow-auto">
+        <table id="rekapTable" class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50 table-header">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Nama</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Jabatan</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr>
+              <td colspan="100%" class="px-6 py-4 text-center text-sm text-gray-500">
+                <div class="flex flex-col items-center justify-center py-12">
+                  <i class="fas fa-table text-4xl text-gray-300 mb-3"></i>
+                  <p class="text-gray-500">Pilih bulan untuk melihat data absensi</p>
+                  <p class="text-sm text-gray-400 mt-1">Data akan muncul setelah memilih bulan</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- Info Footer -->
+    <div class="mt-8 text-center text-sm text-gray-500">
+      <p class="inline-flex items-center gap-1">
+        <span>Sistem Rekap Absensi GTK SMP Negeri 1 Sukasada © 2025</span>
+        <span>•</span>
+        <span>Dibangun dengan <i class="fas fa-heart text-red-400"></i></span>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const urlBase = "https://script.google.com/macros/s/AKfycbyC2u7QSNYOmm0FE6OQJC_uE8ZLCp-kDBYsziycgYFrV3UoE_EUjZkegY9l6wuzMio/exec"; // Ganti dengan URL Web Apps kamu
+
+    const bulanSelect = document.getElementById("bulanSelect");
+    const tanggalSelect = document.getElementById("tanggalSelect");
+    const tipeRekap = document.getElementById("tipeRekap");
+    const table = document.getElementById("rekapTable");
+    const tbody = table.querySelector("tbody");
+    const thead = table.querySelector("thead tr");
+    const btnExportPDF = document.getElementById("btnExportPDF");
+    const btnRefresh = document.getElementById("btnRefresh");
+    const searchInput = document.getElementById("searchInput");
+
+    let currentData = [];
+    let currentTanggalUnik = [];
+    let filteredData = [];
+
+    bulanSelect.addEventListener("change", () => {
+      loadData();
+    });
+
+    tanggalSelect.addEventListener("change", () => {
+      renderTable();
+    });
+
+    tipeRekap.addEventListener("change", () => {
+      renderTable();
+    });
+
+    btnRefresh.addEventListener("click", () => {
+      loadData();
+    });
+
+    searchInput.addEventListener("input", () => {
+      renderTable();
+    });
+
+    async function loadData() {
+      const bulan = bulanSelect.value;
+      tbody.innerHTML = "";
+      while (thead.cells.length > 2) thead.deleteCell(-1);
+
+      tanggalSelect.disabled = true;
+      tanggalSelect.innerHTML = `<option value="">--Semua Tanggal--</option>`;
+      btnExportPDF.disabled = true;
+      searchInput.value = "";
+
+      if (!bulan) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="100%" class="px-6 py-4 text-center text-sm text-gray-500">
+              <div class="flex flex-col items-center justify-center py-12">
+                <i class="fas fa-table text-4xl text-gray-300 mb-3"></i>
+                <p class="text-gray-500">Pilih bulan untuk melihat data absensi</p>
+                <p class="text-sm text-gray-400 mt-1">Data akan muncul setelah memilih bulan</p>
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      // Show loading state
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="100%" class="px-6 py-4 text-center text-sm text-gray-500">
+            <div class="flex flex-col items-center justify-center py-12">
+              <i class="fas fa-spinner fa-spin text-4xl text-emerald-500 mb-3 pulse"></i>
+              <p class="text-gray-600 font-medium">Memuat data absensi...</p>
+              <p class="text-sm text-gray-400 mt-1">Harap tunggu sebentar</p>
+            </div>
+          </td>
+        </tr>
+      `;
+
+      const data = await fetchData(bulan);
+      if (!data.length) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="100%" class="px-6 py-4 text-center text-sm text-gray-500">
+              <div class="flex flex-col items-center justify-center py-12">
+                <i class="fas fa-exclamation-circle text-4xl text-yellow-500 mb-3"></i>
+                <p class="text-gray-600 font-medium">Tidak ada data absensi</p>
+                <p class="text-sm text-gray-400 mt-1">Tidak ditemukan data untuk bulan ${bulan}</p>
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      currentData = data;
+      currentTanggalUnik = [...new Set(data.map(d => d.tanggal))].sort((a, b) => {
+        const da = a.split("/").reverse().join("-");
+        const db = b.split("/").reverse().join("-");
+        return da.localeCompare(db);
+      });
+
+      currentTanggalUnik.forEach(tgl => {
+        const opt = document.createElement("option");
+        opt.value = tgl;
+        opt.textContent = tgl;
+        tanggalSelect.appendChild(opt);
+      });
+
+      tanggalSelect.disabled = false;
+      renderTable();
+    }
+
+    function renderTable() {
+      tbody.innerHTML = "";
+      while (thead.cells.length > 2) thead.deleteCell(-1);
+
+      let filterTanggal = tanggalSelect.value;
+      let rekapMode = tipeRekap.value;
+      let searchTerm = searchInput.value.toLowerCase();
+
+      let tanggalList = [];
+
+      if (rekapMode === "harian" && filterTanggal) {
+        tanggalList = [filterTanggal];
+      } else if (rekapMode === "mingguan" && filterTanggal) {
+        const tglDate = new Date(filterTanggal.split("/").reverse().join("-"));
+        const start = new Date(tglDate);
+        start.setDate(start.getDate() - start.getDay()); // Minggu
+        const end = new Date(start);
+        end.setDate(end.getDate() + 6); // Sabtu
+
+        tanggalList = currentTanggalUnik.filter(tgl => {
+          const tglObj = new Date(tgl.split("/").reverse().join("-"));
+          return tglObj >= start && tglObj <= end;
+        });
+      } else {
+        tanggalList = currentTanggalUnik;
+      }
+
+      tanggalList.forEach(tgl => {
+        const th = document.createElement("th");
+        th.scope = "col";
+        th.className = "px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider";
+        th.textContent = tgl;
+        thead.appendChild(th);
+      });
+
+      const guruMap = new Map();
+      currentData.forEach(d => {
+        const key = d.nama + "||" + d.jabatan;
+        if (!guruMap.has(key)) guruMap.set(key, { nama: d.nama, jabatan: d.jabatan });
+      });
+
+      if (guruMap.size === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="100%" class="px-6 py-4 text-center text-sm text-gray-500">
+              <div class="flex flex-col items-center justify-center py-12">
+                <i class="fas fa-exclamation-circle text-4xl text-yellow-500 mb-3"></i>
+                <p class="text-gray-600 font-medium">Tidak ada data yang sesuai</p>
+                <p class="text-sm text-gray-400 mt-1">Sesuaikan filter untuk menampilkan data</p>
+              </div>
+            </td>
+          </tr>
+        `;
+        btnExportPDF.disabled = true;
+        return;
+      }
+
+      // Convert Map to array and sort by position first, then by name
+      const sortedGuru = Array.from(guruMap.entries()).sort((a, b) => {
+        const jabatanA = a[1].jabatan.toLowerCase();
+        const jabatanB = b[1].jabatan.toLowerCase();
+        const namaA = a[1].nama.toLowerCase();
+        const namaB = b[1].nama.toLowerCase();
+        
+        // First sort by position
+        if (jabatanA !== jabatanB) {
+          return jabatanA.localeCompare(jabatanB);
+        }
+        // If positions are equal, sort by name
+        return namaA.localeCompare(namaB);
+      });
+
+      // Apply search filter
+      const filteredGuru = searchTerm 
+        ? sortedGuru.filter(([key, { nama }]) => nama.toLowerCase().includes(searchTerm))
+        : sortedGuru;
+
+      if (filteredGuru.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="100%" class="px-6 py-4 text-center text-sm text-gray-500">
+              <div class="flex flex-col items-center justify-center py-12">
+                <i class="fas fa-search text-4xl text-gray-400 mb-3"></i>
+                <p class="text-gray-600 font-medium">Data tidak ditemukan</p>
+                <p class="text-sm text-gray-400 mt-1">Coba dengan kata kunci lain</p>
+              </div>
+            </td>
+          </tr>
+        `;
+        btnExportPDF.disabled = true;
+        return;
+      }
+
+      filteredGuru.forEach(([key, { nama, jabatan }]) => {
+        const tr = document.createElement("tr");
+        tr.className = "table-row hover:bg-gray-50 transition-colors";
+        
+        const tdNama = document.createElement("td");
+        tdNama.className = "px-6 py-4 whitespace-nowrap";
+        const namaDiv = document.createElement("div");
+        namaDiv.className = "text-sm font-medium text-gray-900";
+        namaDiv.textContent = nama;
+        tdNama.appendChild(namaDiv);
+        tr.appendChild(tdNama);
+        
+        const tdJabatan = document.createElement("td");
+        tdJabatan.className = "px-6 py-4 whitespace-nowrap";
+        const jabatanDiv = document.createElement("div");
+        jabatanDiv.className = "text-sm text-gray-500";
+        jabatanDiv.textContent = jabatan;
+        tdJabatan.appendChild(jabatanDiv);
+        tr.appendChild(tdJabatan);
+
+        tanggalList.forEach(tgl => {
+          const records = currentData.filter(d => d.nama === nama && d.tanggal === tgl);
+          const cellContent = document.createElement("div");
+          cellContent.className = "flex flex-col gap-1";
+          
+          records.forEach(r => {
+            const keterangan = r.keterangan.toLowerCase();
+            const waktu = r.waktu_absen;
+            
+            // Capitalize first letter of "datang" and "pulang"
+            const displayKeterangan = keterangan === 'datang' ? 'Datang' : 
+                                    keterangan === 'pulang' ? 'Pulang' : 
+                                    keterangan.charAt(0).toUpperCase() + keterangan.slice(1);
+            
+            const statusDiv = document.createElement("div");
+            statusDiv.className = "flex items-center gap-2 text-xs";
+            
+            if (keterangan === 'hadir') {
+              statusDiv.innerHTML = `<span class="status-badge status-hadir"><i class="fas fa-check-circle mr-1"></i>${displayKeterangan}</span> <span class="text-gray-500">${waktu}</span>`;
+            } else if (keterangan === 'sakit') {
+              statusDiv.innerHTML = `<span class="status-badge status-sakit"><i class="fas fa-procedures mr-1"></i>${displayKeterangan}</span> <span class="text-gray-500">${waktu}</span>`;
+            } else if (keterangan === 'izin') {
+              statusDiv.innerHTML = `<span class="status-badge status-izin"><i class="fas fa-envelope mr-1"></i>${displayKeterangan}</span> <span class="text-gray-500">${waktu}</span>`;
+            } else if (keterangan === 'alpa') {
+              statusDiv.innerHTML = `<span class="status-badge status-alpa"><i class="fas fa-times-circle mr-1"></i>${displayKeterangan}</span>`;
+            } else {
+              statusDiv.innerHTML = `<span>${displayKeterangan}</span> <span class="text-gray-500">${waktu}</span>`;
+            }
+            
+            cellContent.appendChild(statusDiv);
+          });
+          
+          const td = document.createElement("td");
+          td.className = "px-6 py-4 text-sm text-gray-500";
+          if (records.length === 0) {
+            td.innerHTML = '<span class="text-gray-300">-</span>';
+          } else {
+            td.appendChild(cellContent);
+          }
+          tr.appendChild(td);
+        });
+
+        tbody.appendChild(tr);
+      });
+
+      btnExportPDF.disabled = false;
+    }
+
+    async function fetchData(bulan) {
+      try {
+        const res = await fetch(`${urlBase}?bulan=${encodeURIComponent(bulan)}`);
+        const data = await res.json();
+        return data.error ? [] : data;
+      } catch (err) {
+        console.error("Error:", err);
+        return [];
+      }
+    }
+
+    btnExportPDF.addEventListener("click", () => {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
+
+      let filterTanggal = tanggalSelect.value;
+      let rekapMode = tipeRekap.value;
+      let searchTerm = searchInput.value.toLowerCase();
+      let tanggalList = [];
+
+      if (rekapMode === "harian" && filterTanggal) {
+        tanggalList = [filterTanggal];
+      } else if (rekapMode === "mingguan" && filterTanggal) {
+        const tglDate = new Date(filterTanggal.split("/").reverse().join("-"));
+        const start = new Date(tglDate);
+        start.setDate(start.getDate() - start.getDay());
+        const end = new Date(start);
+        end.setDate(end.getDate() + 6);
+
+        tanggalList = currentTanggalUnik.filter(tgl => {
+          const tglObj = new Date(tgl.split("/").reverse().join("-"));
+          return tglObj >= start && tglObj <= end;
+        });
+      } else {
+        tanggalList = currentTanggalUnik;
+      }
+
+      const headers = ["Nama", "Jabatan", ...tanggalList];
+
+      const guruMap = new Map();
+      currentData.forEach(d => {
+        const key = d.nama + "||" + d.jabatan;
+        if (!guruMap.has(key)) guruMap.set(key, { nama: d.nama, jabatan: d.jabatan, data: {} });
+        if (!guruMap.get(key).data[d.tanggal]) guruMap.get(key).data[d.tanggal] = [];
+        
+        // Capitalize first letter of "datang" and "pulang" for PDF
+        const keterangan = d.keterangan.toLowerCase();
+        const displayKeterangan = keterangan === 'datang' ? 'Datang' : 
+                                keterangan === 'pulang' ? 'Pulang' : 
+                                keterangan.charAt(0).toUpperCase() + keterangan.slice(1);
+        
+        guruMap.get(key).data[d.tanggal].push(`${displayKeterangan} (${d.waktu_absen})`);
+      });
+
+      // Sort by position first, then by name for PDF export
+      const sortedGuru = Array.from(guruMap.entries()).sort((a, b) => {
+        const jabatanA = a[1].jabatan.toLowerCase();
+        const jabatanB = b[1].jabatan.toLowerCase();
+        const namaA = a[1].nama.toLowerCase();
+        const namaB = b[1].nama.toLowerCase();
+        
+        if (jabatanA !== jabatanB) {
+          return jabatanA.localeCompare(jabatanB);
+        }
+        return namaA.localeCompare(namaB);
+      });
+
+      // Apply search filter for PDF
+      const filteredGuru = searchTerm 
+        ? sortedGuru.filter(([key, { nama }]) => nama.toLowerCase().includes(searchTerm))
+        : sortedGuru;
+
+      const body = [];
+      filteredGuru.forEach(([key, { nama, jabatan, data }]) => {
+        const row = [nama, jabatan];
+        tanggalList.forEach(tgl => {
+          row.push(data[tgl] ? data[tgl].join(" ") : "");
+        });
+        body.push(row);
+      });
+
+      doc.setFontSize(14);
+      doc.text(`Rekap Absen GTK SMP NEGERI 1 SUKASADA - ${rekapMode.charAt(0).toUpperCase() + rekapMode.slice(1)} ${bulanSelect.value}`, 40, 40);
+      doc.autoTable({
+        startY: 60,
+        head: [headers],
+        body: body,
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [16, 185, 129] }, // emerald-500
+        margin: { top: 60, left: 40, right: 40 },
+      });
+      doc.save(`rekap_${rekapMode}_${bulanSelect.value}.pdf`);
+    });
+  </script>
+</body>
+</html>
